@@ -37,7 +37,7 @@ class LocalTxnNotifier implements TxnNotifier {
     await plugin.show(
       id: txnId,
       title: '${formatPaise(txn.amountPaise)} $verb',
-      body: '${txn.merchant}${categories.isEmpty ? '' : ' — tap a category'}',
+      body: '${txn.merchant}${categories.isEmpty ? '' : ' · tap a category'}',
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           channel.channelId,

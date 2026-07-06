@@ -37,7 +37,7 @@ class PdfReport {
       build: (context) => [
         pw.Header(
             level: 0,
-            child: pw.Text('FinTrack — $title',
+            child: pw.Text('FinTrack · $title',
                 style: pw.TextStyle(
                     fontSize: 22, fontWeight: pw.FontWeight.bold))),
         pw.SizedBox(height: 8),
