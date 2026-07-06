@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/db.dart';
 import '../services/notif_service.dart' show formatPaise;
 import '../state/providers.dart';
 import 'theme.dart';
