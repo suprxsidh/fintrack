@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 TransactionsCompanion txn({
   int amountPaise = 5500,
-  String merchant = 'PRAVEEN R V',
-  String? accountTail = '106',
+  String merchant = 'RAMESH KUMAR',
+  String? accountTail = '123',
   String? smsRef,
   DateTime? txDate,
   TxnSource source = TxnSource.sms,
@@ -43,11 +43,11 @@ void main() {
   });
 
   test('duplicate by smsRef', () async {
-    await db.insertTransaction(txn(smsRef: '655315924126'));
+    await db.insertTransaction(txn(smsRef: '412345678901'));
     expect(
         await db.isDuplicate(
             amountPaise: 9900, // ref match wins regardless of amount
-            smsRef: '655315924126',
+            smsRef: '412345678901',
             txDate: DateTime(2026, 7, 7)),
         isTrue);
   });
@@ -58,13 +58,13 @@ void main() {
     expect(
         await db.isDuplicate(
             amountPaise: 5500,
-            accountTail: '106',
+            accountTail: '123',
             txDate: t0.add(const Duration(seconds: 60))),
         isTrue);
     expect(
         await db.isDuplicate(
             amountPaise: 5500,
-            accountTail: '106',
+            accountTail: '123',
             txDate: t0.add(const Duration(seconds: 200))),
         isFalse,
         reason: 'outside window');
@@ -80,8 +80,8 @@ void main() {
   test('setCategory teaches merchant memory, categoryFor recalls', () async {
     final id = await db.insertTransaction(txn());
     await db.setCategory(id, 1);
-    expect(await db.categoryFor('PRAVEEN R V'), 1);
-    expect(await db.categoryFor('praveen r v'), 1, reason: 'case-insensitive');
+    expect(await db.categoryFor('RAMESH KUMAR'), 1);
+    expect(await db.categoryFor('ramesh kumar'), 1, reason: 'case-insensitive');
     expect(await db.categoryFor('UNKNOWN SHOP'), isNull);
   });
 

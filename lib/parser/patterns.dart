@@ -29,9 +29,9 @@ class BankPattern {
 }
 
 final bankPatterns = <BankPattern>[
-  // ICICI UPI debit — VERIFIED against real sample 2026-07-06:
-  // "ICICI Bank Acct XX106 debited for Rs 55.00 on 06-Jul-26; PRAVEEN R V
-  //  credited. UPI:655315924126. Call 18002662 for dispute."
+  // ICICI UPI debit — VERIFIED against a real sample 2026-07-06 (details anonymized):
+  // "ICICI Bank Acct XX123 debited for Rs 55.00 on 06-Jul-26; RAMESH KUMAR
+  //  credited. UPI:412345678901. Call 18002662 for dispute."
   BankPattern(
     bank: 'ICICI',
     direction: TxnDirection.debit,
@@ -45,7 +45,7 @@ final bankPatterns = <BankPattern>[
     refGroup: 5,
   ),
   // ICICI account credit — UNVERIFIED draft:
-  // "Your ICICI Bank Acct XX106 is credited with Rs 500.00 on 06-Jul-26 from
+  // "Your ICICI Bank Acct XX123 is credited with Rs 500.00 on 06-Jul-26 from
   //  NAME. UPI:1234"
   BankPattern(
     bank: 'ICICI',
@@ -76,7 +76,7 @@ final bankPatterns = <BankPattern>[
   ),
   // Kotak UPI debit — UNVERIFIED draft:
   // "Sent Rs.55.00 from Kotak Bank AC X1234 to name@upi on 06-07-26.UPI Ref
-  //  655315924126. Not you, kotak.com/fraud"
+  //  412345678901. Not you, kotak.com/fraud"
   BankPattern(
     bank: 'Kotak',
     direction: TxnDirection.debit,
@@ -106,7 +106,7 @@ final bankPatterns = <BankPattern>[
   ),
   // Indian Bank debit — UNVERIFIED draft:
   // "Rs. 55.00 debited from A/c *1234 on 06-07-2026 to VPA name@upi Ref
-  //  655315924126. Indian Bank"
+  //  412345678901. Indian Bank"
   BankPattern(
     bank: 'IndianBank',
     direction: TxnDirection.debit,

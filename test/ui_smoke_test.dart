@@ -14,7 +14,7 @@ void main() {
     await db.insertTransaction(TransactionsCompanion.insert(
       amountPaise: 5500,
       direction: TxnDirection.debit,
-      merchant: 'PRAVEEN R V',
+      merchant: 'RAMESH KUMAR',
       txDate: DateTime.now(),
       source: TxnSource.sms,
     ));
@@ -26,7 +26,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Spent this month'), findsOneWidget);
-    expect(find.text('PRAVEEN R V'), findsOneWidget);
+    expect(find.text('RAMESH KUMAR'), findsOneWidget);
 
     await tester.tap(find.text('Activity'));
     await tester.pumpAndSettle();

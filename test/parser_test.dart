@@ -3,8 +3,8 @@ import 'package:fintrack/parser/sms_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // Real sample from user's phone, 2026-07-06. The one VERIFIED pattern.
-const icici = 'ICICI Bank Acct XX106 debited for Rs 55.00 on 06-Jul-26; '
-    'PRAVEEN R V credited. UPI:655315924126. Call 18002662 for dispute. '
+const icici = 'ICICI Bank Acct XX123 debited for Rs 55.00 on 06-Jul-26; '
+    'RAMESH KUMAR credited. UPI:412345678901. Call 18002662 for dispute. '
     'SMS BLOCK 106 to 9215676766.';
 
 void main() {
@@ -26,16 +26,16 @@ void main() {
       final t = SmsParser.parse('AX-ICICIB-S', icici)!;
       expect(t.amountPaise, 5500);
       expect(t.direction, TxnDirection.debit);
-      expect(t.merchant, 'PRAVEEN R V');
-      expect(t.accountTail, '106');
+      expect(t.merchant, 'RAMESH KUMAR');
+      expect(t.accountTail, '123');
       expect(t.txDate, DateTime(2026, 7, 6));
-      expect(t.ref, '655315924126');
+      expect(t.ref, '412345678901');
       expect(t.bank, 'ICICI');
     });
     test('parses amount with commas', () {
       final t = SmsParser.parse(
           'AX-ICICIB-S',
-          'ICICI Bank Acct XX106 debited for Rs 1,299.50 on 06-Jul-26; '
+          'ICICI Bank Acct XX123 debited for Rs 1,299.50 on 06-Jul-26; '
           'AMAZON PAY credited. UPI:99. blah')!;
       expect(t.amountPaise, 129950);
     });
@@ -97,7 +97,7 @@ void main() {
     test('balance enquiry', () {
       expect(
           SmsParser.parse(
-              'AX-ICICIB-S', 'Avl Bal in Acct XX106 is Rs 12,345.67.'),
+              'AX-ICICIB-S', 'Avl Bal in Acct XX123 is Rs 12,345.67.'),
           isNull);
     });
     test('non-bank sender with txn-looking text', () {

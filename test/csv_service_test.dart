@@ -11,8 +11,8 @@ void main() {
     final idA = await a.insertTransaction(TransactionsCompanion.insert(
       amountPaise: 5500,
       direction: TxnDirection.debit,
-      merchant: 'PRAVEEN R V',
-      accountTail: const Value('106'),
+      merchant: 'RAMESH KUMAR',
+      accountTail: const Value('123'),
       txDate: DateTime(2026, 7, 6),
       source: TxnSource.sms,
       note: const Value('lunch'),
@@ -36,10 +36,10 @@ void main() {
 
     final rows = await b.monthTransactions(DateTime(2026, 7));
     expect(rows.length, 2);
-    final lunch = rows.firstWhere((t) => t.merchant == 'PRAVEEN R V');
+    final lunch = rows.firstWhere((t) => t.merchant == 'RAMESH KUMAR');
     expect(lunch.amountPaise, 5500);
     expect(lunch.note, 'lunch');
-    expect(lunch.accountTail, '106');
+    expect(lunch.accountTail, '123');
     final cats = await b.allCategories();
     expect(cats.firstWhere((c) => c.id == lunch.categoryId).name, 'Food');
 

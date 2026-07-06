@@ -4,8 +4,8 @@ import 'package:fintrack/data/db.dart';
 import 'package:fintrack/services/capture_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const icici = 'ICICI Bank Acct XX106 debited for Rs 55.00 on 06-Jul-26; '
-    'PRAVEEN R V credited. UPI:655315924126. Call 18002662 for dispute.';
+const icici = 'ICICI Bank Acct XX123 debited for Rs 55.00 on 06-Jul-26; '
+    'RAMESH KUMAR credited. UPI:412345678901. Call 18002662 for dispute.';
 
 class FakeNotifier implements TxnNotifier {
   final txnCalls = <(int, Transaction, List<Category>)>[];
@@ -56,7 +56,7 @@ void main() {
     // same merchant, later different txn
     final body2 = icici
         .replaceFirst('55.00', '80.00')
-        .replaceFirst('655315924126', '777');
+        .replaceFirst('412345678901', '777');
     await svc.handleSms(
         'AX-ICICIB-S', body2, at.add(const Duration(hours: 2)));
     final (_, txn2, cats2) = notifier.txnCalls.last;

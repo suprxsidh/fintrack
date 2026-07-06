@@ -23,8 +23,8 @@ void main() {
     final importer = HistoryImporter(CaptureService(db, notifier));
     final now = DateTime.now();
 
-    const icici = 'ICICI Bank Acct XX106 debited for Rs 55.00 on 06-Jul-26; '
-        'PRAVEEN R V credited. UPI:655315924126.';
+    const icici = 'ICICI Bank Acct XX123 debited for Rs 55.00 on 06-Jul-26; '
+        'RAMESH KUMAR credited. UPI:412345678901.';
     final inbox = [
       InboxSms('AX-ICICIB-S', icici, now),
       InboxSms('AX-ICICIB-S', icici, now), // exact duplicate

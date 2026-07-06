@@ -32,7 +32,7 @@ background Dart isolate + inbox query for history import), `flutter_local_notifi
 ```
 SMS arrives → BroadcastReceiver (pkg) → background Dart isolate
   → SenderFilter (bank sender IDs) → SmsParser (per-bank regex table)
-    → parsed:   dedup-check → insert Drift → notification "₹55 PRAVEEN R V" [Food][Travel][Shopping][More…]
+    → parsed:   dedup-check → insert Drift → notification "₹55 RAMESH KUMAR" [Food][Travel][Shopping][More…]
     → unparsed: insert into review_queue → silent notification "1 SMS needs review"
 Notification action tap → sets category (background handler, no app open needed)
 ```
@@ -45,7 +45,7 @@ Per-bank regex patterns in a Dart table (`lib/parser/patterns.dart`), each yield
 amount, direction (debit/credit), merchant/counterparty, account tail, date, ref.
 
 Verified sample (ICICI debit):
-`ICICI Bank Acct XX106 debited for Rs 55.00 on 06-Jul-26; PRAVEEN R V credited. UPI:655315924126. ...`
+`ICICI Bank Acct XX123 debited for Rs 55.00 on 06-Jul-26; RAMESH KUMAR credited. UPI:412345678901. ...`
 
 Kotak + Indian Bank patterns drafted from known formats, marked unverified until user
 supplies real samples; anything unmatched from a bank sender goes to the review queue,
