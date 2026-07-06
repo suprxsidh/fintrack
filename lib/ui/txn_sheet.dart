@@ -10,10 +10,10 @@ import 'theme.dart';
 
 /// Add (existing == null) or edit a transaction. Handles category learning
 /// through AppDb.setCategory so notifications and manual edits teach the
-/// same merchant memory.
-Future<void> showTxnSheet(BuildContext context, WidgetRef ref,
+/// same merchant memory. Resolves true when the user saved.
+Future<bool?> showTxnSheet(BuildContext context, WidgetRef ref,
     {Transaction? existing, String? prefillMerchant, int? prefillPaise}) {
-  return showModalBottomSheet(
+  return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
@@ -107,7 +107,7 @@ class _TxnFormState extends ConsumerState<_TxnForm> {
     if (_categoryId != null && _categoryId != e?.categoryId) {
       await db.setCategory(id, _categoryId!);
     }
-    if (mounted) Navigator.pop(context);
+    if (mounted) Navigator.pop(context, true);
   }
 
   @override
