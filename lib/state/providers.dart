@@ -62,3 +62,13 @@ final reviewQueueProvider = StreamProvider<List<ReviewQueueData>>((ref) {
   return (db.select(db.reviewQueue)..where((r) => r.resolved.equals(false)))
       .watch();
 });
+
+/// Last ~6 months of transactions, for trend charts + recurring detection.
+final recentTxnsProvider = StreamProvider<List<Transaction>>((ref) {
+  final db = ref.watch(dbProvider);
+  final cutoff = DateTime.now().subtract(const Duration(days: 185));
+  return (db.select(db.transactions)
+        ..where((t) => t.txDate.isBiggerOrEqualValue(cutoff))
+        ..orderBy([(t) => OrderingTerm.asc(t.txDate)]))
+      .watch();
+});
