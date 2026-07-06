@@ -1,10 +1,13 @@
 import 'package:another_telephony/telephony.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'services/capture_service.dart';
 import 'services/db_holder.dart';
 import 'services/notif_service.dart';
+import 'state/providers.dart';
+import 'ui/app.dart';
 
 final _notifPlugin = FlutterLocalNotificationsPlugin();
 
@@ -58,16 +61,8 @@ Future<void> main() async {
     );
   }
 
-  runApp(const _PlaceholderApp());
-}
-
-/// Replaced by the real app shell in the UI task.
-class _PlaceholderApp extends StatelessWidget {
-  const _PlaceholderApp();
-
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-        theme: ThemeData(useMaterial3: true),
-        home: const Scaffold(body: Center(child: Text('FinTrack'))),
-      );
+  runApp(ProviderScope(
+    overrides: [dbProvider.overrideWithValue(db)],
+    child: const FinTrackApp(),
+  ));
 }
