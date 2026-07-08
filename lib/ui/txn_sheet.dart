@@ -110,6 +110,32 @@ class _TxnFormState extends ConsumerState<_TxnForm> {
     if (mounted) Navigator.pop(context, true);
   }
 
+  Future<void> _delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete transaction?'),
+        content: const Text('This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final db = ref.read(dbProvider);
+    await (db.delete(db.transactions)
+          ..where((t) => t.id.equals(widget.existing!.id)))
+        .go();
+    if (mounted) Navigator.pop(context, true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cats = ref.watch(categoriesProvider).value ?? const [];
@@ -125,8 +151,23 @@ class _TxnFormState extends ConsumerState<_TxnForm> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.existing == null ? 'Add transaction' : 'Edit transaction',
-                style: Theme.of(context).textTheme.titleLarge),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                    widget.existing == null
+                        ? 'Add transaction'
+                        : 'Edit transaction',
+                    style: Theme.of(context).textTheme.titleLarge),
+                if (widget.existing != null)
+                  TextButton(
+                    onPressed: _delete,
+                    style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.error),
+                    child: const Text('Delete'),
+                  ),
+              ],
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: _amount,
