@@ -73,7 +73,8 @@ class CaptureService {
       final txn = await (db.select(db.transactions)
             ..where((t) => t.id.equals(id)))
           .getSingle();
-      final cats = knownCat == null ? await db.allCategories() : <Category>[];
+      final cats =
+          knownCat == null ? await db.mostUsedCategories() : <Category>[];
       await notifier.showTxn(id, txn, cats);
     }
     return CaptureResult.stored;

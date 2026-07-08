@@ -64,6 +64,31 @@ void main() {
     expect(cats2, isEmpty, reason: 'already categorized');
   });
 
+  test('notification offers most-used category first for a new merchant',
+      () async {
+    final t1 = await db.insertTransaction(TransactionsCompanion.insert(
+      amountPaise: 100,
+      direction: TxnDirection.debit,
+      merchant: 'X',
+      txDate: at,
+      source: TxnSource.manual,
+    ));
+    await db.setCategory(t1, 4);
+    final t2 = await db.insertTransaction(TransactionsCompanion.insert(
+      amountPaise: 200,
+      direction: TxnDirection.debit,
+      merchant: 'Y',
+      txDate: at,
+      source: TxnSource.manual,
+    ));
+    await db.setCategory(t2, 4);
+
+    await svc.handleSms('AX-ICICIB-S', icici, at);
+    final (_, _, cats) = notifier.txnCalls.single;
+    expect(cats.first.id, 4,
+        reason: 'category 4 used twice already, should rank first');
+  });
+
   test('duplicate sms not stored twice', () async {
     await svc.handleSms('AX-ICICIB-S', icici, at);
     expect(await svc.handleSms('AX-ICICIB-S', icici, at),

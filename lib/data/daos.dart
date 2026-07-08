@@ -84,4 +84,29 @@ extension TransactionDao on AppDb {
   }
 
   Future<List<Category>> allCategories() => select(categories).get();
+
+  /// Categories ordered by all-time transaction count, most-used first.
+  /// Categories with no transactions yet are appended (in [allCategories]
+  /// order) so a fresh install still has options to offer.
+  Future<List<Category>> mostUsedCategories({int limit = 3}) async {
+    final txns = await select(transactions).get();
+    final counts = <int, int>{};
+    for (final t in txns) {
+      final catId = t.categoryId;
+      if (catId != null) counts[catId] = (counts[catId] ?? 0) + 1;
+    }
+    final ranked = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final all = await allCategories();
+    final catMap = {for (final c in all) c.id: c};
+    final result = <Category>[
+      for (final e in ranked)
+        if (catMap[e.key] != null) catMap[e.key]!
+    ];
+    for (final c in all) {
+      if (result.length >= limit) break;
+      if (!result.contains(c)) result.add(c);
+    }
+    return result.take(limit).toList();
+  }
 }

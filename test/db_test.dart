@@ -124,4 +124,20 @@ void main() {
     expect(by[null], 500);
     expect(by.values.fold(0, (a, b) => a + b), 1500, reason: 'credit excluded');
   });
+
+  test('mostUsedCategories ranks by usage, pads with unused categories',
+      () async {
+    // Seed order: Food=1, Groceries=2, Travel=3, Shopping=4, Bills=5, ...
+    final t1 = await db.insertTransaction(txn(merchant: 'A'));
+    await db.setCategory(t1, 2);
+    final t2 = await db.insertTransaction(txn(merchant: 'B'));
+    await db.setCategory(t2, 2);
+    final t3 = await db.insertTransaction(txn(merchant: 'C'));
+    await db.setCategory(t3, 5);
+
+    final top = await db.mostUsedCategories(limit: 3);
+    expect(top.map((c) => c.id).toList(), [2, 5, 1],
+        reason: 'cat 2 used twice, cat 5 once, then pad with Food (id 1) '
+            'since it is first in seed order and unused');
+  });
 }
