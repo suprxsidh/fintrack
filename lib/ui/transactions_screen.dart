@@ -86,48 +86,12 @@ class TransactionsScreen extends ConsumerWidget {
                           style: Theme.of(context).textTheme.labelLarge,
                         ),
                       ),
-                      for (final t in byDay[day]!) _DismissibleTxn(txn: t),
+                      for (final t in byDay[day]!) DismissibleTxnTile(txn: t),
                     ],
                   ],
                 ),
         ),
       ],
-    );
-  }
-}
-
-class _DismissibleTxn extends ConsumerWidget {
-  final Transaction txn;
-
-  const _DismissibleTxn({required this.txn});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final db = ref.read(dbProvider);
-    return Dismissible(
-      key: ValueKey(txn.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        color: Theme.of(context).colorScheme.errorContainer,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 24),
-        child: const Icon(Icons.delete),
-      ),
-      onDismissed: (_) async {
-        await (db.delete(db.transactions)..where((t) => t.id.equals(txn.id)))
-            .go();
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Deleted ${txn.merchant}'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () =>
-                  db.into(db.transactions).insert(txn.toCompanion(false)),
-            ),
-          ));
-        }
-      },
-      child: TxnTile(txn: txn),
     );
   }
 }

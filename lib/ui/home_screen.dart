@@ -51,7 +51,9 @@ class HomeScreen extends ConsumerWidget {
         else
           Card(
             child: Column(
-              children: [for (final t in txns.take(10)) TxnTile(txn: t)],
+              children: [
+                for (final t in txns.take(10)) DismissibleTxnTile(txn: t)
+              ],
             ),
           ),
       ],
