@@ -34,9 +34,21 @@ void main() {
   });
   tearDown(() => db.close());
 
-  test('non-bank sender ignored', () async {
-    expect(await svc.handleSms('VM-AMAZON', icici, at), CaptureResult.ignored);
+  test(
+      'unrecognized business sender with bank-formatted body is queued for '
+      'review, not dropped', () async {
+    expect(await svc.handleSms('VM-AMAZON', icici, at),
+        CaptureResult.queuedForReview);
+    expect(notifier.reviewCalls, [1]);
     expect(notifier.txnCalls, isEmpty);
+  });
+
+  test('personal phone number sender ignored even with bank-formatted body',
+      () async {
+    expect(await svc.handleSms('+919812345678', icici, at),
+        CaptureResult.ignored);
+    expect(notifier.txnCalls, isEmpty);
+    expect(notifier.reviewCalls, isEmpty);
   });
 
   test('parseable sms stored + notified with category choices', () async {

@@ -1,7 +1,7 @@
 import 'parsed_txn.dart';
 import 'patterns.dart';
 
-export 'patterns.dart' show isBankSender;
+export 'patterns.dart' show isBankSender, looksLikeTransactionSms;
 
 const _months = {
   'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,

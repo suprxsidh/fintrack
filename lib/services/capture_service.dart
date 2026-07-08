@@ -30,13 +30,13 @@ class CaptureService {
     bool notify = true,
     TxnSource source = TxnSource.sms,
   }) async {
-    if (!isBankSender(sender)) return CaptureResult.ignored;
+    if (!looksLikeTransactionSms(sender, body)) return CaptureResult.ignored;
 
     final parsed = SmsParser.parse(sender, body, received: received);
     if (parsed == null) {
-      // Bank sender but unparseable: never drop silently. OTP/promo noise is
-      // filtered by _looksTransactional to keep the queue useful.
-      if (!_looksTransactional(body)) return CaptureResult.ignored;
+      // Passed the content-based gate above but matched no known BankPattern
+      // (unrecognized bank, or a recognized bank sender in a format we
+      // haven't seen): never drop silently, queue for manual review.
       await db.into(db.reviewQueue).insert(ReviewQueueCompanion.insert(
           sender: sender, body: body, receivedAt: received));
       if (notify) {
@@ -78,14 +78,5 @@ class CaptureService {
       await notifier.showTxn(id, txn, cats);
     }
     return CaptureResult.stored;
-  }
-
-  /// Debit/credit language without a parsed pattern → worth human review.
-  static bool _looksTransactional(String body) {
-    final b = body.toLowerCase();
-    if (b.contains('otp')) return false;
-    if (b.contains('avl bal') || b.contains('available balance')) return false;
-    return (b.contains('debit') || b.contains('credit') || b.contains('sent')) &&
-        RegExp(r'(?:rs\.?|inr|₹)\s?[\d,]+', caseSensitive: false).hasMatch(b);
   }
 }

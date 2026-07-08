@@ -141,3 +141,37 @@ final _bankSenderTokens = RegExp(
     caseSensitive: false);
 
 bool isBankSender(String sender) => _bankSenderTokens.hasMatch(sender);
+
+final _personalNumber = RegExp(r'^\+?(?:91)?\d{10}$');
+
+/// True for a plain Indian mobile number. Bank/DLT alerts always come from
+/// short alphanumeric business codes, never a personal number — this is the
+/// only sender signal the generalized detector below relies on, and it
+/// names no bank, so it works for any bank without a maintained allowlist.
+bool _isPersonalNumber(String sender) =>
+    _personalNumber.hasMatch(sender.trim());
+
+final _amountPattern =
+    RegExp(r'(?:rs\.?|inr|₹)\s?[\d,]+(?:\.\d{1,2})?', caseSensitive: false);
+final _directionVerbs = RegExp(
+    r'\b(debited|credited|debit|credit|withdrawn|spent|paid|received|sent)\b',
+    caseSensitive: false);
+final _bankContext = RegExp(
+    r'\b(a/c|acct|account|card|upi|imps|neft|rtgs|ref no|txn)\b',
+    caseSensitive: false);
+
+/// True if [body] reads like a bank transaction alert, regardless of which
+/// bank sent it or whether [sender] is a recognized bank sender ID. This is
+/// the entry gate for capture: auto-store still requires a full match
+/// against a known [BankPattern] (see [isBankSender], used inside
+/// `SmsParser.parse`) — this function only decides whether an unmatched
+/// message reaches the review queue instead of being dropped.
+bool looksLikeTransactionSms(String sender, String body) {
+  if (_isPersonalNumber(sender)) return false;
+  final b = body.toLowerCase();
+  if (b.contains('otp')) return false;
+  if (b.contains('avl bal') || b.contains('available balance')) return false;
+  return _amountPattern.hasMatch(b) &&
+      _directionVerbs.hasMatch(b) &&
+      _bankContext.hasMatch(b);
+}

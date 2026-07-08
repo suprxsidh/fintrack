@@ -119,4 +119,41 @@ void main() {
       expect(parseAmountPaise('abc'), isNull);
     });
   });
+
+  group('looksLikeTransactionSms (bank-agnostic detection)', () {
+    test('unrecognized business sender with transaction wording passes', () {
+      expect(
+          looksLikeTransactionSms(
+              'VM-SOMEBANK', 'Rs 500 debited from A/c XX1234 via UPI'),
+          isTrue);
+    });
+    test('known bank sender with a real sample still passes', () {
+      expect(looksLikeTransactionSms('AX-ICICIB-S', icici), isTrue);
+    });
+    test('personal phone number sender rejected even with transaction wording',
+        () {
+      expect(
+          looksLikeTransactionSms(
+              '+919812345678', 'Rs 500 debited from A/c XX1234 via UPI'),
+          isFalse);
+    });
+    test('otp rejected', () {
+      expect(
+          looksLikeTransactionSms(
+              'AX-ICICIB-S', '482913 is the OTP for txn of Rs 55.00.'),
+          isFalse);
+    });
+    test('promo without a direction verb rejected', () {
+      expect(
+          looksLikeTransactionSms('AX-ICICIB-S',
+              'Get 10% cashback up to Rs 200 on your next UPI payment!'),
+          isFalse);
+    });
+    test('balance enquiry rejected', () {
+      expect(
+          looksLikeTransactionSms(
+              'AX-ICICIB-S', 'Avl Bal in Acct XX123 is Rs 12,345.67.'),
+          isFalse);
+    });
+  });
 }
