@@ -37,7 +37,9 @@ extension TransactionDao on AppDb {
     return near.isNotEmpty;
   }
 
-  /// All transactions in [month]'s calendar month, newest first.
+  /// All transactions in [month]'s calendar month, newest first. Same-day
+  /// rows (common: bank SMS often carry no time-of-day) break ties by
+  /// createdAt so the most recently captured shows first.
   Future<List<Transaction>> monthTransactions(DateTime month) {
     final start = DateTime(month.year, month.month);
     final end = DateTime(month.year, month.month + 1);
@@ -45,7 +47,10 @@ extension TransactionDao on AppDb {
           ..where((t) =>
               t.txDate.isBiggerOrEqualValue(start) &
               t.txDate.isSmallerThanValue(end))
-          ..orderBy([(t) => OrderingTerm.desc(t.txDate)]))
+          ..orderBy([
+            (t) => OrderingTerm.desc(t.txDate),
+            (t) => OrderingTerm.desc(t.createdAt),
+          ]))
         .get();
   }
 

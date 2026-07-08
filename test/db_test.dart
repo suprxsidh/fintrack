@@ -77,6 +77,29 @@ void main() {
         reason: 'different account');
   });
 
+  test('monthTransactions orders same-day rows by createdAt, newest first',
+      () async {
+    final sameDay = DateTime(2026, 7, 6); // midnight: mimics date-only SMS
+    final firstId = await db.insertTransaction(TransactionsCompanion.insert(
+      amountPaise: 100,
+      direction: TxnDirection.debit,
+      merchant: 'FIRST',
+      txDate: sameDay,
+      source: TxnSource.sms,
+      createdAt: Value(DateTime(2026, 7, 6, 10, 0)),
+    ));
+    final secondId = await db.insertTransaction(TransactionsCompanion.insert(
+      amountPaise: 200,
+      direction: TxnDirection.debit,
+      merchant: 'SECOND',
+      txDate: sameDay,
+      source: TxnSource.sms,
+      createdAt: Value(DateTime(2026, 7, 6, 11, 0)),
+    ));
+    final rows = await db.monthTransactions(DateTime(2026, 7));
+    expect(rows.map((r) => r.id).toList(), [secondId, firstId]);
+  });
+
   test('setCategory teaches merchant memory, categoryFor recalls', () async {
     final id = await db.insertTransaction(txn());
     await db.setCategory(id, 1);

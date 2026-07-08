@@ -30,7 +30,10 @@ final monthTxnsProvider = StreamProvider<List<Transaction>>((ref) {
         ..where((t) =>
             t.txDate.isBiggerOrEqualValue(start) &
             t.txDate.isSmallerThanValue(end))
-        ..orderBy([(t) => OrderingTerm.desc(t.txDate)]))
+        ..orderBy([
+          (t) => OrderingTerm.desc(t.txDate),
+          (t) => OrderingTerm.desc(t.createdAt),
+        ]))
       .watch();
 });
 
