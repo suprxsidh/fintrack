@@ -127,6 +127,13 @@ void main() {
     expect(notifier.reviewCalls, isEmpty);
   });
 
+  test('bank match with trailing balance line still stored, not dropped',
+      () async {
+    final withBalance = '$icici Avl Bal: Rs 5,000.00.';
+    expect(await svc.handleSms('AX-ICICIB-S', withBalance, at),
+        CaptureResult.stored);
+  });
+
   test('import mode: stored silently', () async {
     expect(
         await svc.handleSms('AX-ICICIB-S', icici, at,

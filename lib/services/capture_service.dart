@@ -30,13 +30,15 @@ class CaptureService {
     bool notify = true,
     TxnSource source = TxnSource.sms,
   }) async {
-    if (!looksLikeTransactionSms(sender, body)) return CaptureResult.ignored;
-
     final parsed = SmsParser.parse(sender, body, received: received);
     if (parsed == null) {
-      // Passed the content-based gate above but matched no known BankPattern
-      // (unrecognized bank, or a recognized bank sender in a format we
-      // haven't seen): never drop silently, queue for manual review.
+      // Unrecognized bank/format, or a recognized bank sender in a format
+      // we haven't seen: never drop silently if it looks like a
+      // transaction — queue for manual review. A full BankPattern match
+      // above always stores unconditionally, regardless of content
+      // signals like "avl bal" or "otp" appearing incidentally in a real
+      // transaction SMS.
+      if (!looksLikeTransactionSms(sender, body)) return CaptureResult.ignored;
       await db.into(db.reviewQueue).insert(ReviewQueueCompanion.insert(
           sender: sender, body: body, receivedAt: received));
       if (notify) {
