@@ -79,7 +79,15 @@ class _TxnFormState extends ConsumerState<_TxnForm> {
   Future<void> _save() async {
     final paise = _paise;
     final merchant = _merchant.text.trim();
-    if (paise == null || merchant.isEmpty) return;
+    if (paise == null || merchant.isEmpty) {
+      final missing = [
+        if (paise == null) 'a valid amount',
+        if (merchant.isEmpty) 'a merchant/person name',
+      ].join(' and ');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Enter $missing')));
+      return;
+    }
     final db = ref.read(dbProvider);
     final e = widget.existing;
     int id;

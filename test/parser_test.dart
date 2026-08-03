@@ -7,10 +7,31 @@ const icici = 'ICICI Bank Acct XX123 debited for Rs 55.00 on 06-Jul-26; '
     'RAMESH KUMAR credited. UPI:412345678901. Call 18002662 for dispute. '
     'SMS BLOCK 106 to 9215676766.';
 
+// Real samples from a v1.1.0 tester's phone, 2026-08-02 (sender
+// AD-AXISBK-S), verbatim including the real newlines between segments.
+const axisP2m = 'INR 200.00 debited\n'
+    'A/c no. XX7014\n'
+    '02-08-26, 22:40:49\n'
+    'UPI/P2M/6214121248O/CHOWRASIA CHATS\n'
+    'Not you? SMS BLOCKUPI Cust ID to 919951860002\n'
+    'Axis Bank';
+const axisP2a = 'INR 463.00 debited\n'
+    'A/c no. XX7014\n'
+    '02-08-26, 18:29:07\n'
+    'UPI/P2A/658024268085/Sardeep Mandal\n'
+    'Not you? SMS BLOCKUPI Cust ID to 919951860002\n'
+    'Axis Bank';
+
 void main() {
   group('bank sender detection', () {
     test('accepts DLT sender ids', () {
-      for (final s in ['AX-ICICIB-S', 'JD-KOTAKB', 'CP-INDBNK-S', 'ICICIT']) {
+      for (final s in [
+        'AX-ICICIB-S',
+        'JD-KOTAKB',
+        'CP-INDBNK-S',
+        'ICICIT',
+        'AD-AXISBK-S'
+      ]) {
         expect(isBankSender(s), isTrue, reason: s);
       }
     });
@@ -78,6 +99,32 @@ void main() {
           'Avl Lmt: INR 1,00,000.')!;
       expect(t.amountPaise, 45000);
       expect(t.merchant, 'SWIGGY');
+    });
+  });
+
+  group('Axis (verified real samples, 2026-08-02)', () {
+    test('sender recognized', () {
+      expect(isBankSender('AD-AXISBK-S'), isTrue);
+    });
+    test('parses UPI/P2M debit exactly', () {
+      final t = SmsParser.parse('AD-AXISBK-S', axisP2m)!;
+      expect(t.amountPaise, 20000);
+      expect(t.direction, TxnDirection.debit);
+      expect(t.accountTail, '7014');
+      expect(t.merchant, 'CHOWRASIA CHATS');
+      expect(t.txDate, DateTime(2026, 8, 2));
+      expect(t.ref, '6214121248O');
+      expect(t.bank, 'Axis');
+    });
+    test('parses UPI/P2A debit exactly', () {
+      final t = SmsParser.parse('AD-AXISBK-S', axisP2a)!;
+      expect(t.amountPaise, 46300);
+      expect(t.direction, TxnDirection.debit);
+      expect(t.accountTail, '7014');
+      expect(t.merchant, 'Sardeep Mandal');
+      expect(t.txDate, DateTime(2026, 8, 2));
+      expect(t.ref, '658024268085');
+      expect(t.bank, 'Axis');
     });
   });
 

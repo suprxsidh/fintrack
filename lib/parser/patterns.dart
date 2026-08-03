@@ -133,11 +133,40 @@ final bankPatterns = <BankPattern>[
     refGroup: 5,
     fallbackMerchant: 'Credit',
   ),
+  // Axis Bank UPI debit — VERIFIED against two real samples 2026-08-02
+  // (sender AD-AXISBK-S), one P2M and one P2A:
+  // "INR 200.00 debited\nA/c no. XX7014\n02-08-26, 22:40:49\n
+  //  UPI/P2M/6214121248O/CHOWRASIA CHATS\nNot you? SMS BLOCKUPI Cust ID to
+  //  919951860002\nAxis Bank"
+  // "INR 463.00 debited\nA/c no. XX7014\n02-08-26, 18:29:07\n
+  //  UPI/P2A/658024268085/Sardeep Mandal\nNot you? SMS BLOCKUPI Cust ID to
+  //  919951860002\nAxis Bank"
+  // Real Axis bodies are multi-line; `\s+` below matches both a real `\n`
+  // and a plain space, so the same pattern works whether the segments are
+  // newline- or space-separated. P2M (person-to-merchant) and P2A
+  // (person-to-account) share this one pattern via `P2[MA]`.
+  BankPattern(
+    bank: 'Axis',
+    direction: TxnDirection.debit,
+    regex: RegExp(
+        r'INR\s+([\d,]+(?:\.\d{1,2})?)\s+debited\s+A/c\s+no\.?\s+XX(\w+)\s+'
+        r'(\d{2}-\d{2}-\d{2,4}),?\s+\d{2}:\d{2}:\d{2}\s+UPI/P2[MA]/'
+        r'([A-Za-z0-9]+)/([^\n]+?)(?=\n|\s+Not you\b|$)',
+        caseSensitive: false),
+    amountGroup: 1,
+    tailGroup: 2,
+    dateGroup: 3,
+    refGroup: 4,
+    merchantGroup: 5,
+  ),
 ];
 
-/// DLT sender IDs look like "AX-ICICIB-S", "JD-KOTAKB", "CP-INDBNK-S".
+/// DLT sender IDs look like "AX-ICICIB-S", "JD-KOTAKB", "CP-INDBNK-S",
+/// "AD-AXISBK-S" (AXISBK verified against a real Axis Bank sample
+/// 2026-08-02; no other Axis DLT token has been seen yet, so only that one
+/// is included).
 final _bankSenderTokens = RegExp(
-    r'ICICIB|ICICIT|KOTAKB|KOTAKM|INDBNK|INDBK|INDIANBK',
+    r'ICICIB|ICICIT|KOTAKB|KOTAKM|INDBNK|INDBK|INDIANBK|AXISBK',
     caseSensitive: false);
 
 bool isBankSender(String sender) => _bankSenderTokens.hasMatch(sender);

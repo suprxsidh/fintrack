@@ -50,7 +50,9 @@ class ReviewScreen extends ConsumerWidget {
                             FilledButton.tonal(
                               onPressed: () async {
                                 final saved = await showTxnSheet(context, ref,
-                                    prefillPaise: _guessPaise(item.body));
+                                    prefillPaise: _guessPaise(item.body),
+                                    prefillMerchant:
+                                        _guessMerchant(item.body));
                                 if (saved == true) _resolve(ref, item.id);
                               },
                               child: const Text('Add expense'),
@@ -78,5 +80,18 @@ class ReviewScreen extends ConsumerWidget {
             caseSensitive: false)
         .firstMatch(body);
     return m == null ? null : parseAmountPaise(m.group(1)!);
+  }
+
+  /// Loose merchant/payee guess for prefill: the trailing name in a
+  /// `UPI/<type>/<ref>/<name>` segment (e.g. Axis's "UPI/P2M/6214.../NAME").
+  /// ICICI/Kotak/IndianBank UPI refs don't use this double-slash shape
+  /// (they're "UPI:123" or "UPI Ref 123"), so this never fires for them —
+  /// returns null rather than guessing wrong when the body doesn't match.
+  static String? _guessMerchant(String body) {
+    final m = RegExp(r'UPI/[^/\n]+/[^/\n]+/([^\n]+?)(?=\n|\s+Not you\b|$)',
+            caseSensitive: false)
+        .firstMatch(body);
+    final name = m?.group(1)?.trim();
+    return (name == null || name.isEmpty) ? null : name;
   }
 }
